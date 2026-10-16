@@ -1,139 +1,79 @@
-class GoodMorningThread extends Thread 
+
+public class Threadexample 
 {
-public void run() 
-           {
-while (true) 
+public static void main(String[] args)
+throws InterruptedException
+    {
+final PC pc = new PC();
+        Thread t1 = new Thread(new Runnable() {
+            @Override
+public void run()
             {
-System.out.println("Good Morning");
 try
+{
+pc.produce();
+                }
+catch (InterruptedException e) 
+{
+e.printStackTrace();
+                }
+            }
+        });
+
+        Thread t2 = new Thread(new Runnable()
+{
+            @Override
+public void run()
             {
-sleep(1000); 
-            } 
-catch (InterruptedException e) 
-             {
-e.printStackTrace();
-            }
-        }
-    }
-}
-
-class HelloThread extends Thread 
-{
-public void run() 
-{
-while (true) 
-{
-System.out.println("Hello");
-try
-{
-Thread.sleep(2000); 
-            } 
+try {
+pc.consume();
+                }
 catch (InterruptedException e) 
 {
 e.printStackTrace();
+                }
+            }
+        });
+t1.start();
+t2.start();
+t1.join();
+t2.join();
+    }
+public static class PC 
+{
+        LinkedList<Integer> list = new LinkedList<>();
+int capacity = 2;
+
+public void produce() throws InterruptedException
+        {
+int value = 0;
+while (true) {
+synchronized (this)
+{
+while (list.size() == capacity)
+wait();
+System.out.println("Producer produced-"+ value);
+list.add(value++);
+notify();
+Thread.sleep(1000);
+                }
             }
         }
-    }
-}
 
-class WelcomeThread extends Thread 
-{
-public void run() 
-{
+public void consume() throws InterruptedException
+        {
 while (true) 
 {
-System.out.println("Welcome");
-try
-{
-Thread.sleep(3000); 
-            } 
-catch (InterruptedException e) 
-{
-e.printStackTrace();
+synchronized (this)
+                {
+while (list.size() == 0)
+wait();
+int val = list.removeFirst();
+System.out.println("Consumer consumed-"+ val);
+notify();
+Thread.sleep(1000);
+                }
             }
         }
     }
 }
-
-public class ThreadDemo {
-public static void main(String[] args) 
-{
-        GoodMorningThread thread1 = new GoodMorningThread();
-        HelloThread thread2 = new HelloThread();
-        WelcomeThread thread3 = new WelcomeThread();
-
-thread1.start();
-thread2.start();
-thread3.start();
-    }
-           using Runnable:
-class GoodMorningRunnable implements Runnable 
-{
-public void run() 
-{
-while (true) 
-{
-System.out.println("Good Morning");
-try
-{
-Thread.sleep(1000
-            } 
-catch (InterruptedException e) 
-{
-e.printStackTrace();
-            }
-        }
-    }
-}
-
-class HelloRunnable implements Runnable 
-{
-public void run() 
-{
-while (true) 
-{
-System.out.println("Hello");
-try
-{
-Thread.sleep(2000); 
-            } 
-catch (InterruptedException e) 
-{
-e.printStackTrace();
-            }
-        }
-    }
-}
-
-class WelcomeRunnable implements Runnable 
-{
-public void run() 
-{
-while (true) 
-{
-System.out.println("Welcome");
-try
-{
-Thread.sleep(3000); // Sleep for 3 seconds
-            } catch (InterruptedException e) {
-e.printStackTrace();
-            }
-        }
-    }
-}
-public class RunnableThreadDemo 
-{
-public static void main(String[] args) 
-{
-        Runnable gmRunnable = new GoodMorningRunnable();
-        Runnable helloRunnable = new HelloRunnable();
-        Runnable welcomeRunnable = new WelcomeRunnable();
-        Thread thread1 = new Thread(gmRunnable);
-        Thread thread2 = new Thread(helloRunnable);
-        Thread thread3 = new Thread(welcomeRunnable);
-thread1.start();
-thread2.start();
-thread3.start();
-    }
-}
-}s
